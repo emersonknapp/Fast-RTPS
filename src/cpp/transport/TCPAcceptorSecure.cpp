@@ -48,14 +48,12 @@ void TCPAcceptorSecure::accept(
     using asio::ip::tcp;
     using TLSHSRole = TCPTransportDescriptor::TLSConfig::TLSHandShakeRole;
 
-    secure_socket_ = new asio::ssl::stream<asio::ip::tcp::socket>(*io_service_, ssl_context);
-
     // We are going to be called by the lambdas, but we may be already deleted. Save the locator so we will need it.
     Locator_t locator = locator_;
     try
     {
-        acceptor_.async_accept(secure_socket_->lowest_layer(),
-            [this, locator, parent](const std::error_code& error)
+        acceptor_.async_accept(
+            [this, locator, parent, &ssl_context](const std::error_code& error, tcp::socket socket)
             {
                 if (!error)
                 {
@@ -66,6 +64,8 @@ void TCPAcceptorSecure::accept(
                     }
 
                     logError(RTCP_TLS, "Accepted");
+
+                    secure_socket_ = new asio::ssl::stream<asio::ip::tcp::socket>(std::move(socket), ssl_context);
 
                     secure_socket_->async_handshake(role,
                         [this, locator, parent](const std::error_code& error)
