@@ -100,6 +100,7 @@ void TCPChannelResourceSecure::connect()
                     }
 
                     logError(RTCP_TLS, "Connected: " << IPLocator::to_string(locator));
+                    std::cout << "Connected: " << IPLocator::to_string(locator) << std::endl;
 
                     secure_socket->async_handshake(role,
                         [locator, parent](const std::error_code& error)
@@ -107,11 +108,13 @@ void TCPChannelResourceSecure::connect()
                         if (!error)
                         {
                             logError(RTCP_TLS, "Handshake OK: " << IPLocator::to_string(locator));
+                            std::cout << "Handshake OK: " << IPLocator::to_string(locator) << std::endl;
                             parent->SocketConnected(locator, error);
                         }
                         else
                         {
                             logError(RTCP_TLS, "Handshake failed: " << error.message());
+                            std::cout << "Handshake failed: " << error.message() << std::endl;
                             eClock::my_sleep(5000); // Retry, but after a big while
                             parent->SocketConnected(locator, error);
                         }
