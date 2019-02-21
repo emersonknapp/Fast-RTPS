@@ -44,11 +44,12 @@ void TCPAcceptorBasic::accept(TCPTransportInterface* parent)
     Locator_t locator = locator_;
     using asio::ip::tcp;
 
-    socket_ = new tcp::socket(*io_service_);
+    //socket_ = new tcp::socket(*io_service_);
 
-    acceptor_.async_accept(*socket_,
-        [this, locator, parent](const std::error_code& error)
+    acceptor_.async_accept(/**socket_,*/
+        [this, locator, parent](const std::error_code& error, tcp::socket socket)
         {
+            socket_ = new tcp::socket(std::move(socket));
             parent->SocketAccepted(this, locator, error);
         });
 }
