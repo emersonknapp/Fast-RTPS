@@ -31,6 +31,8 @@
 
 #include <fastrtps/rtps/messages/RTPSMessageCreator.h>
 
+#include <foonathan/memory/namespace_alias.hpp>
+
 namespace eprosima {
 namespace fastrtps {
 namespace rtps {
@@ -95,7 +97,9 @@ WriterProxy::~WriterProxy()
     delete(heartbeat_response_);
 }
 
-WriterProxy::WriterProxy(StatefulReader* reader)
+WriterProxy::WriterProxy(
+        StatefulReader* reader,
+        const ResourceLimitedContainerConfig& changes_allocation)
     : reader_(reader)
     , heartbeat_response_(nullptr)
     , writer_proxy_liveliness_(nullptr)
@@ -103,6 +107,10 @@ WriterProxy::WriterProxy(StatefulReader* reader)
     , last_heartbeat_count_(0)
     , heartbeat_final_flag_(false)
     , is_alive_(false)
+    , changes_pool_(
+        memory::set_node_size<ChangeFromWriter_t>::value,
+        memory::set_node_size<ChangeFromWriter_t>::value * changes_allocation.initial)
+    , changes_from_writer_(changes_pool_)
     , guid_as_vector_(ResourceLimitedContainerConfig::fixed_size_configuration(1u))
 {
     //Create Events
