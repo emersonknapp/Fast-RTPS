@@ -84,7 +84,8 @@ size_t RTCPMessageManager::sendMessage(
     size_t send = p_channel_resource->send(msg.buffer, msg.length, ec);
     if (send != msg.length)
     {
-        logWarning(RTCP, "Bad sent size..." << send << " bytes of " << msg.length << " bytes: " << ec.message());
+        logError(RTCP, "Bad sent size..." << send << " bytes of " << msg.length << " bytes: " << ec.message());
+        logError(DEBUG, IPLocator::to_string(p_channel_resource->locator()));
     }
     //logInfo(RTCP, "Sent " << send << " bytes");
     return send;
