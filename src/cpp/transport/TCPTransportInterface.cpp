@@ -707,7 +707,7 @@ bool TCPTransportInterface::OpenOutputChannel(const Locator_t& locator)
         else
         {
             // Create output channel
-            logInfo(OpenOutputChannel, "OpenOutputChannel (physical: "
+            logError(OpenOutputChannel, "OpenOutputChannel (physical: "
                 << IPLocator::getPhysicalPort(locator) << "; logical: "
                 << IPLocator::getLogicalPort(locator) << ") @ IP: " << IPLocator::toIPv4string(locator));
 #if TLS_FOUND

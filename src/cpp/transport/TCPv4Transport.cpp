@@ -361,7 +361,7 @@ LocatorList_t TCPv4Transport::ShrinkLocatorLists(const std::vector<LocatorList_t
                     Locator_t loopbackLocator;
                     fill_local_ip(loopbackLocator);
                     // Don't shrink to localhost if localhost isn't allowed but the other interface
-                    if (!is_interface_whitelist_empty() && is_interface_allowed(loopbackLocator))
+                    if (is_interface_whitelist_empty() || is_interface_allowed(loopbackLocator))
                     {
                         IPLocator::setPhysicalPort(loopbackLocator, IPLocator::getPhysicalPort(*it));
                         IPLocator::setLogicalPort(loopbackLocator, IPLocator::getLogicalPort(*it));
