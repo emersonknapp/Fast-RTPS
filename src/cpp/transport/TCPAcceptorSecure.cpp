@@ -70,7 +70,7 @@ void TCPAcceptorSecure::accept(
                     secure_socket_->async_handshake(role,
                         [this, locator, parent](const std::error_code& error)
                         {
-                            logError(RTCP_TLS, "Handshake");
+                            logError(RTCP_TLS, "Handshake: " << error.message());
                             parent->SecureSocketAccepted(this, locator, error);
                         });
                 }

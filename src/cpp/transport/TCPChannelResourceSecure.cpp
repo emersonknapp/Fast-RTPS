@@ -185,9 +185,7 @@ uint32_t TCPChannelResourceSecure::send(
         asio::error_code& ec)
 {
     std::unique_lock<std::recursive_mutex> write_lock(write_mutex());
-    logError(DEBUG, "A");
     uint32_t sent = static_cast<uint32_t>(secure_socket_->write_some(asio::buffer(data, size), ec));
-    logError(DEBUG, "B");
     return sent;
     /*
     size_t sent = 0;

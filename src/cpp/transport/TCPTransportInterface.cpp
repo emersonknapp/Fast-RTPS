@@ -1454,6 +1454,7 @@ void TCPTransportInterface::SecureSocketAccepted(
     {
         logError(RTCP_TLS, "Connection aborted in acceptor: " << error.message());
     }
+    delete acceptor->move_socket();
 
 }
 #endif
