@@ -25,6 +25,7 @@ namespace rtps{
 
 class TCPAcceptorSecure : public TCPAcceptor
 {
+    asio::ssl::stream<asio::ip::tcp::socket>* secure_socket_;
 public:
     /**
     * Constructor
@@ -55,10 +56,20 @@ public:
     {
         acceptor_.cancel();
         acceptor_.close();
+        delete secure_socket_;
     }
 
     //! Method to start the accepting process.
-    void accept(TCPTransportInterface* parent, asio::io_service&, asio::ssl::context&);
+    void accept(
+        TCPTransportInterface* parent,
+        asio::ssl::context&);
+
+    asio::ssl::stream<asio::ip::tcp::socket>* move_socket()
+    {
+        asio::ssl::stream<asio::ip::tcp::socket>* to_return = secure_socket_;
+        secure_socket_ = nullptr;
+        return to_return;
+    }
 };
 
 

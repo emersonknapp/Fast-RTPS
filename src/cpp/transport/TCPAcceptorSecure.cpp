@@ -40,7 +40,6 @@ TCPAcceptorSecure::TCPAcceptorSecure(
 
 void TCPAcceptorSecure::accept(
         TCPTransportInterface* parent,
-        io_service&,
         ssl::context& ssl_context)
 {
     logInfo(ACEPTOR, "Listening at: " << acceptor_.local_endpoint().address()
@@ -49,14 +48,15 @@ void TCPAcceptorSecure::accept(
     using asio::ip::tcp;
     using TLSHSRole = TCPTransportDescriptor::TLSConfig::TLSHandShakeRole;
 
+    secure_socket_ = new asio::ssl::stream<asio::ip::tcp::socket>(*io_service_, ssl_context);
+
     // We are going to be called by the lambdas, but we may be already deleted. Save the locator so we will need it.
     Locator_t locator = locator_;
     try
     {
-        acceptor_.async_accept(
-            [this, locator, parent, &ssl_context](const std::error_code& error, tcp::socket socket)
+        acceptor_.async_accept(secure_socket_->lowest_layer(),
+            [this, locator, parent](const std::error_code& error)
             {
-                tcp_secure::eProsimaTCPSocket socket_ptr = tcp_secure::createTCPSocket(std::move(socket), ssl_context);
                 if (!error)
                 {
                     ssl::stream_base::handshake_type role = ssl::stream_base::server;
@@ -64,15 +64,15 @@ void TCPAcceptorSecure::accept(
                     {
                         role = ssl::stream_base::client;
                     }
-                    socket_ptr->async_handshake(role,
-                        [this, locator, parent, socket_ptr](const std::error_code& error)
+                    secure_socket_->async_handshake(role,
+                        [this, locator, parent](const std::error_code& error)
                         {
-                            parent->SecureSocketAccepted(this, locator, socket_ptr, error);
+                            parent->SecureSocketAccepted(this, locator, error);
                         });
                 }
                 else
                 {
-                    parent->SecureSocketAccepted(this, locator, socket_ptr, error); // This method manages errors too.
+                    parent->SecureSocketAccepted(this, locator, error); // This method manages errors too.
                 }
             });
     }

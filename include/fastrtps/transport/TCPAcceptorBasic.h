@@ -24,6 +24,7 @@ namespace rtps{
 
 class TCPAcceptorBasic : public TCPAcceptor
 {
+    asio::ip::tcp::socket* socket_;
 public:
     /**
     * Constructor
@@ -54,10 +55,18 @@ public:
     {
         acceptor_.cancel();
         acceptor_.close();
+        delete socket_;
     }
 
     //! Method to start the accepting process.
-    void accept(TCPTransportInterface* parent, asio::io_service&);
+    void accept(TCPTransportInterface* parent);
+
+    asio::ip::tcp::socket* move_socket()
+    {
+        asio::ip::tcp::socket* to_return = socket_;
+        socket_ = nullptr;
+        return to_return;
+    }
 };
 
 
