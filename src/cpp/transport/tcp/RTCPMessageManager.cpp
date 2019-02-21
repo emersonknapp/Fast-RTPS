@@ -75,18 +75,21 @@ size_t RTCPMessageManager::sendMessage(
         TCPChannelResource *p_channel_resource,
         const CDRMessage_t &msg) const
 {
+    logError(DEBUG, "4");
     if (!alive())
     {
         return 0;
     }
 
     asio::error_code ec;
+    logError(DEBUG, "5");
     size_t send = p_channel_resource->send(msg.buffer, msg.length, ec);
     if (send != msg.length)
     {
         logError(RTCP, "Bad sent size..." << send << " bytes of " << msg.length << " bytes: " << ec.message());
         logError(DEBUG, IPLocator::to_string(p_channel_resource->locator()));
     }
+    logError(DEBUG, "6");
     //logInfo(RTCP, "Sent " << send << " bytes");
     return send;
 }
@@ -98,6 +101,7 @@ bool RTCPMessageManager::sendData(
         const SerializedPayload_t *payload,
         const ResponseCode respCode)
 {
+    logError(DEBUG, "2");
     if (!alive())
     {
         return 0;
@@ -124,6 +128,7 @@ bool RTCPMessageManager::sendData(
         RTPSMessageCreator::addCustomContent(&msg, payload->data, payload->length); // Data
     }
 
+    logError(DEBUG, "3");
     return sendMessage(p_channel_resource, msg) > 0;
 }
 
@@ -290,6 +295,7 @@ TCPTransactionId RTCPMessageManager::sendConnectionRequest(TCPChannelResource *p
     logError(RTCP_MSG, "Send [BIND_CONNECTION_REQUEST] PhysicalPort: " << IPLocator::getPhysicalPort(locator));
     //logError(DEBUG, "Sending Connection Request with locator: " << IPLocator::to_string(request.transportLocator()));
     TCPTransactionId id = getTransactionId();
+    logError(DEBUG, "1");
     bool success = sendData(p_channel_resource, BIND_CONNECTION_REQUEST, id, &payload);
     if (!success)
     {
