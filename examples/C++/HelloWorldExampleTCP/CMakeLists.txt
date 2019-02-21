@@ -25,6 +25,10 @@ if(NOT fastcdr_FOUND)
     find_package(fastcdr REQUIRED)
 endif()
 
+if(NOT foonathan_memory_FOUND)
+    find_package(foonathan_memory REQUIRED)
+endif()
+
 if(NOT fastrtps_FOUND)
     find_package(fastrtps REQUIRED)
 endif()
@@ -50,7 +54,7 @@ configure_file("HelloWorldSubscriber.xml" "HelloWorldSubscriber.xml" COPYONLY)
 configure_file("HelloWorldPublisher.xml" "HelloWorldPublisher.xml" COPYONLY)
 
 add_executable(HelloWorldExampleTCP ${HELLOWORLD_EXAMPLE_SOURCES_CXX} ${HELLOWORLD_EXAMPLE_SOURCES_CPP})
-target_link_libraries(HelloWorldExampleTCP fastrtps fastcdr)
+target_link_libraries(HelloWorldExampleTCP fastrtps fastcdr foonathan_memory)
 install(TARGETS HelloWorldExampleTCP
     RUNTIME DESTINATION examples/C++/HelloWorldExampleTCP/${BIN_INSTALL_DIR})
 
